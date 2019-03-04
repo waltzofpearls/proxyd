@@ -12,11 +12,16 @@ fn main() -> Result<()> {
 }
 
 fn handle(mut client: TcpStream) -> Result<()> {
+    let mut request = vec![0; 1024];
+    client.read(&mut request)?;
+
     let mut server = TcpStream::connect("127.0.0.1:9000")?;
-    server.write(&[1])?;
-    server.read(&mut [0; 128])?;
-    // client.write(&[1])?;
-    // client.read(&mut [0; 128])?;
-    client.write_all(b"HTTP/1.0 200 OK\r\n\r\n").unwrap();
+    server.write_all(&request)?;
+    server.shutdown(std::net::Shutdown::Write)?;
+
+    let mut response = Vec::new();
+    server.read_to_end(&mut response)?;
+
+    client.write_all(&response)?;
     Ok(())
 }
