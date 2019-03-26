@@ -1,1 +1,1 @@
-# proxyd
+# proxyd-rs
